@@ -5,7 +5,10 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.content.BroadcastReceiver;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.telephony.SmsManager;
 import android.view.View;
@@ -14,6 +17,7 @@ import android.widget.Button;
 public class MainActivity extends AppCompatActivity {
 
     Button btnSend;
+    private BroadcastReceiver messageReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,6 +27,10 @@ public class MainActivity extends AppCompatActivity {
         btnSend = findViewById(R.id.btnSend);
 
         checkPermission();
+
+        messageReceiver = new MessageReceiver();
+        IntentFilter filter = new IntentFilter("android.provider.Telephony.SMS_RECEIVED");
+        this.registerReceiver(messageReceiver, filter);
 
         btnSend.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -46,4 +54,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onDestroy(){
+        super.onDestroy();
+        this.unregisterReceiver(messageReceiver);
+    }
 }
